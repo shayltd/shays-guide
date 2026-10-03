@@ -188,6 +188,7 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 .rgo{width:100%;background:var(--purple);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;margin-top:4px}
 .rgskip{width:100%;background:none;border:none;color:var(--muted);font-size:13px;padding:10px;margin-top:2px}
 .beta{max-width:640px;margin:8px auto 0;padding:8px 14px;font-size:11.5px;line-height:1.5;color:var(--muted);text-align:center;direction:rtl}
+#search::-webkit-search-cancel-button,#search::-webkit-search-decoration,#search::-ms-clear{display:none;-webkit-appearance:none}
 </style>
 </head>
 <body>
@@ -202,7 +203,7 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 <div class="searchwrap">
   <div class="searchbox" id="sbox">
     <span class="sicon">&#9906;</span>
-    <input id="search" type="search" placeholder="Search sign, analyte, disease..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <input id="search" type="text" placeholder="Search sign, analyte, disease..." autocomplete="off" autocorrect="off" spellcheck="false">
     <span class="clearbtn" id="clear">&times;</span>
     <div class="ac" id="ac"></div>
   </div>
@@ -259,7 +260,7 @@ function buildACen(q){
   DATA.vitals.forEach((v,i)=>{if((v.disease+' '+v.result).toLowerCase().includes(q))out.push({t:'vt',score:v.disease.toLowerCase().startsWith(q)?0:2,label:v.disease,sub:v.group,i});});
   DATA.ddx.forEach((s,i)=>{if(s.sign.toLowerCase().includes(q))return;var hay='';if(s.groups){for(var g in s.groups)hay+=' '+g+' '+s.groups[g].join(' ');}else{hay=s.differentials.join(' ');}if(hay.toLowerCase().includes(q))out.push({t:'dx',score:5,label:s.sign,sub:'in differentials',i});});
   DATA.bloodwork.forEach(a=>{const hay=(a.increased+a.decreased+a.notes+a.high_term+a.low_term).toLowerCase();if(!a.name.toLowerCase().includes(q)&&hay.includes(q))out.push({t:'bw',score:6,label:a.name,sub:'in details',name:a.name});});
-  out.sort((a,b)=>a.score-b.score||a.label.length-b.label.length);
+  const TORD={dx:0,bw:1,tt:2,vt:3,pt:4};const BYNAME=r=>r.score<=2?0:1;out.sort((a,b)=>BYNAME(a)-BYNAME(b)||(TORD[a.t]-TORD[b.t])||a.score-b.score||a.label.length-b.label.length);
   return out;
 }
 function renderAC(){
