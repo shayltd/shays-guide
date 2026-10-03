@@ -191,6 +191,7 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 .beta{max-width:640px;margin:8px auto 0;padding:8px 14px;font-size:11.5px;line-height:1.5;color:var(--muted);text-align:center;direction:rtl}
 #search::-webkit-search-cancel-button,#search::-webkit-search-decoration,#search::-ms-clear{display:none;-webkit-appearance:none}
 .ac-sec{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--muted);background:#f6f6fa;padding:5px 14px;border-bottom:1px solid var(--line);direction:rtl;text-align:right}
+.dxn{font-weight:700;color:#111}
 </style>
 </head>
 <body>
@@ -333,9 +334,12 @@ function renderDDx(){let h='',last='';ddxSections().forEach((sec,i)=>{const shee
  const key='dx'+i,label=esc(sec.name.replace(/^(CATTLE|SHEEP & GOATS)\s*\u2014\s*/i,''));
  h+='<div class="grp '+(sheep?'sheep ':'')+(openGroups[key]?'open':'')+'" id="grp-'+key+'"><div class="grp-h" onclick="toggleGrp(\''+key+'\')"><span>'+label+'</span><span class="cnt">'+sec.items.length+(sec.items.length===1?' sign':' signs')+'</span><span class="chev">&#9656;</span></div><div class="grp-body">';
  sec.items.forEach(s=>{const k='dxi'+DATA.ddx.indexOf(s);h+=itemRow(k,esc(s.sign),'');if(openItems[k])h+=ddxDetail(s);});h+='</div></div>';});app.innerHTML=h;}
+function dxName(s){const m=s.match(/^(.*?)(\s[—–(:]|\s-\s)/);const head=m?m[1]:s;const tail=s.slice(head.length);
+ if(!head.trim()||head.length>70)return arrows(s);return '<b class="dxn">'+arrows(head)+'</b>'+arrows(tail);}
+const PLAINGRP=/^(Step|Posture|Approach|Pointers|Note)/;
 function ddxDetail(s){const sh=isSheep(s.section)?' sheep':'';let h='<div class="inl dxinl">';
- if(s.groups){for(const g in s.groups){h+='<div class="ddxgrp'+sh+'">'+esc(g)+'</div><ul class="diffs'+sh+'">'+s.groups[g].map(d=>'<li>'+arrows(d)+zb(d)+'</li>').join('')+'</ul>';}}
- else h+='<ul class="diffs'+sh+'">'+s.differentials.map(d=>'<li>'+arrows(d)+zb(d)+'</li>').join('')+'</ul>';return h+reportLink(s.sign)+'</div>';}
+ if(s.groups){for(const g in s.groups){const plain=PLAINGRP.test(g);h+='<div class="ddxgrp'+sh+'">'+esc(g)+'</div><ul class="diffs'+sh+'">'+s.groups[g].map(d=>'<li>'+(plain?arrows(d):dxName(d))+zb(d)+'</li>').join('')+'</ul>';}}
+ else h+='<ul class="diffs'+sh+'">'+s.differentials.map(d=>'<li>'+dxName(d)+zb(d)+'</li>').join('')+'</ul>';return h+reportLink(s.sign)+'</div>';}
 function scrollToEl(el,off){if(!el)return;const y=el.getBoundingClientRect().top+window.scrollY-(off||190);window.scrollTo({top:y,behavior:'smooth'});}
 function renderVitals(){let h='';vitalGroups().forEach((g,i)=>{const key='vt'+i;if(openGroups[key]===undefined)openGroups[key]=true;h+=grpHead(key,esc(g.name),g.items.length);
  g.items.forEach(v=>{const k='vti'+DATA.vitals.indexOf(v);h+=itemRow(k,esc(v.disease),'');if(openItems[k])h+=vtDetail(v);});h+='</div></div>';});app.innerHTML=h;}
