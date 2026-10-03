@@ -1,7 +1,7 @@
 {
- "name": "Shay's Vet Field Guide",
- "short_name": "Shay Guide",
- "description": "Cattle & small-ruminant field guide — DDx, bloodwork, diagnostics",
+ "name": "Shay's Guide — Vet Field Guide",
+ "short_name": "Shay's Guide",
+ "description": "Cattle, sheep & goats field guide — DDx, bloodwork, diagnostics",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

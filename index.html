@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="apple-mobile-web-app-title" content="Shay Guide">
+<meta name="apple-mobile-web-app-title" content="Shay's Guide">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Shay's Vet Field Guide</title>
 <style>
@@ -187,6 +187,7 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 .regbox input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;margin-bottom:9px;font-family:inherit}
 .rgo{width:100%;background:var(--purple);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;margin-top:4px}
 .rgskip{width:100%;background:none;border:none;color:var(--muted);font-size:13px;padding:10px;margin-top:2px}
+.beta{max-width:640px;margin:8px auto 0;padding:8px 14px;font-size:11.5px;line-height:1.5;color:var(--muted);text-align:center;direction:rtl}
 </style>
 </head>
 <body>
@@ -194,8 +195,8 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
   <div class="hwrap">
     <div class="logo">V</div>
     <div class="brand"><h1>Shay's Field Guide</h1>
-      <span>Bovine differentials &amp; bloodwork</span></div>
-    <div class="ver">v2026.1</div>
+      <span>Cattle, sheep &amp; goats — DDx, bloodwork, diagnostics</span></div>
+    <div class="ver">v2026.2</div>
   </div>
 </header>
 <div class="searchwrap">
@@ -217,12 +218,7 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
   <div class="subtab" data-sub="patterns">Patterns</div>
 </div>
 <div class="ibar" id="ibar" style="display:none"><span id="itxt">התקן את המדריך כאפליקציה</span><button class="ibtn" id="ibtn">התקנה</button><button class="ix" id="ix">&times;</button></div>
-<div class="reg" id="reg" style="display:none"><div class="regbox">
-<h3>ברוך הבא למדריך השטח</h3>
-<p>רישום קצר, פעם אחת, כדי שנדע מי משתמש ונוכל לעדכן אתכם.<br>יש ללחוץ על הכפתור ולשלוח את ההודעה בוואטסאפ.</p>
-<input id="rgName" placeholder="שם מלא" autocomplete="name">
-<button class="rgo" id="rgGo">שליחה והתחלה</button>
-</div></div>
+<div class="beta">גרסת הרצה וניסיון — אשמח לשמוע על טעויות, חוסרים והערות (כפתור Report)</div>
 <main id="app"></main>
 <button class="fab" onclick="reportFab()" aria-label="Report an error">&#9873; Report</button>
 <script>
@@ -321,14 +317,14 @@ function isSheep(section){return /SHEEP|GOAT/i.test(section);}
 const ZOO=/(brucell|coxiella|q fever|anthrax|bacillus anthracis|(?<!pseudo)rabies|rift valley|\brvf\b|tubercul|\borf\b|contagious ecthyma|pseudocowpox|cowpox|papular stomatitis|parapox|ringworm|trichophyton|dermatophyt|cryptosporid|salmonell|leptospir|listeri|chlamydia abortus|chlamydophila abortus|enzootic abortion|toxoplasm|sarcopt|\bbse\b|screwworm|chrysomya|wohlfahrtia|erysipel)/i;
 function zb(t){return ZOO.test(t)?' <span class="zoo" title="Zoonotic — wear PPE">Z</span>':'';}
 const REPORT_PHONE='972522851369';
-function waUrl(name){const u=who();const who_=u&&u.n?('\nמדווח: '+u.n+(u.o?' ('+u.o+')':'')):'';const txt="דיווח על טעות — Shay's Field Guide v2026.1\nערך: "+name+who_+"\nמה בדיוק הבעיה? ";return 'https://wa.me/'+REPORT_PHONE+'?text='+encodeURIComponent(txt);}
+function waUrl(name){const who_='';const txt="דיווח על טעות — Shay's Field Guide v2026.2\nערך: "+name+who_+"\nמה בדיוק הבעיה? ";return 'https://wa.me/'+REPORT_PHONE+'?text='+encodeURIComponent(txt);}
 let lastItem=null;
 function keyName(k){const n=+k.slice(3);if(k.startsWith('dxi'))return DATA.ddx[n].sign;if(k.startsWith('bwi'))return DATA.bloodwork[n].name;if(k.startsWith('tti'))return DATA.tests[n].disease;if(k.startsWith('vti'))return DATA.vitals[n].disease;return null;}
 function reportFab(){const where=tab==='ddx'?'DDx Signs':'Lab Values / '+({vitals:'Normal Values',bloodwork:'Bloodwork',tests:'Diagnostics',patterns:'Patterns'}[sub]||sub);
  window.open(waUrl(lastItem||('כללי ('+where+(query?' — חיפוש: '+query:'')+')')),'_blank');}
 function reportLink(name){return '';}
 function renderDDx(){let h='',last='';ddxSections().forEach((sec,i)=>{const sheep=isSheep(sec.name),sp=sheep?'sheep':'cattle';
- if(sp!==last){h+='<div class="species-band '+sp+'">'+(sheep?'\u25c6 Sheep &amp; Goats':'\u25c6 Cattle')+'</div>';last=sp;}
+ if(sp!==last){h+='<div class="species-band '+sp+'">'+(sheep?'\u25c6 Sheep &amp; Goats (partial)':'\u25c6 Cattle')+'</div>';last=sp;}
  const key='dx'+i,label=esc(sec.name.replace(/^(CATTLE|SHEEP & GOATS)\s*\u2014\s*/i,''));
  h+='<div class="grp '+(sheep?'sheep ':'')+(openGroups[key]?'open':'')+'" id="grp-'+key+'"><div class="grp-h" onclick="toggleGrp(\''+key+'\')"><span>'+label+'</span><span class="cnt">'+sec.items.length+(sec.items.length===1?' sign':' signs')+'</span><span class="chev">&#9656;</span></div><div class="grp-body">';
  sec.items.forEach(s=>{const k='dxi'+DATA.ddx.indexOf(s);h+=itemRow(k,esc(s.sign),'');if(openItems[k])h+=ddxDetail(s);});h+='</div></div>';});app.innerHTML=h;}
@@ -445,7 +441,7 @@ document.getElementById('ibtn').onclick=async()=>{if(!deferredPrompt)return;defe
  document.getElementById('ibar').style.display='none';document.body.style.paddingTop='';};
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;showInstallBar();});
 window.addEventListener('appinstalled',()=>{document.getElementById('ibar').style.display='none';document.body.style.paddingTop='';});
-showReg();setTimeout(showInstallBar,1200);
+setTimeout(showInstallBar,1200);
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
 </body>
