@@ -178,6 +178,15 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 .fab{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;background:var(--purple);color:#fff;border:none;border-radius:22px;padding:10px 15px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(52,49,102,.35);cursor:pointer;opacity:.94}
 .fab:active{transform:scale(.96)}main{padding-bottom:80px}
 .rowrep{color:var(--muted);text-decoration:none;font-size:15px;padding:2px 8px;margin-right:2px;border:1px solid var(--line);border-radius:12px;background:#fff;line-height:1.2}
+.ibar{position:fixed;top:0;left:0;right:0;z-index:90;background:#1f1d3d;color:#fff;display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;padding-top:calc(9px + env(safe-area-inset-top))}
+.ibar span{flex:1}.ibtn{background:#fff;color:var(--purple);border:none;border-radius:16px;padding:6px 13px;font-size:12.5px;font-weight:800}
+.ix{background:none;border:none;color:#fff;font-size:20px;opacity:.7;padding:0 4px}
+.reg{position:fixed;inset:0;z-index:95;background:rgba(26,26,46,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+.regbox{background:#fff;border-radius:16px;padding:20px;max-width:360px;width:100%;direction:rtl;text-align:right;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.regbox h3{font-size:17px;color:var(--purple);margin-bottom:6px}.regbox p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.regbox input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;margin-bottom:9px;font-family:inherit}
+.rgo{width:100%;background:var(--purple);color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;margin-top:4px}
+.rgskip{width:100%;background:none;border:none;color:var(--muted);font-size:13px;padding:10px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -207,6 +216,13 @@ mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
   <div class="subtab" data-sub="tests">Diagnostics</div>
   <div class="subtab" data-sub="patterns">Patterns</div>
 </div>
+<div class="ibar" id="ibar" style="display:none"><span id="itxt">התקן את המדריך כאפליקציה</span><button class="ibtn" id="ibtn">התקנה</button><button class="ix" id="ix">&times;</button></div>
+<div class="reg" id="reg" style="display:none"><div class="regbox">
+<h3>ברוך הבא למדריך השטח</h3>
+<p>רישום קצר, פעם אחת, כדי שנדע מי משתמש ונוכל לעדכן אתכם.<br>יש ללחוץ על הכפתור ולשלוח את ההודעה בוואטסאפ.</p>
+<input id="rgName" placeholder="שם מלא" autocomplete="name">
+<button class="rgo" id="rgGo">שליחה והתחלה</button>
+</div></div>
 <main id="app"></main>
 <button class="fab" onclick="reportFab()" aria-label="Report an error">&#9873; Report</button>
 <script>
@@ -305,7 +321,7 @@ function isSheep(section){return /SHEEP|GOAT/i.test(section);}
 const ZOO=/(brucell|coxiella|q fever|anthrax|bacillus anthracis|(?<!pseudo)rabies|rift valley|\brvf\b|tubercul|\borf\b|contagious ecthyma|pseudocowpox|cowpox|papular stomatitis|parapox|ringworm|trichophyton|dermatophyt|cryptosporid|salmonell|leptospir|listeri|chlamydia abortus|chlamydophila abortus|enzootic abortion|toxoplasm|sarcopt|\bbse\b|screwworm|chrysomya|wohlfahrtia|erysipel)/i;
 function zb(t){return ZOO.test(t)?' <span class="zoo" title="Zoonotic — wear PPE">Z</span>':'';}
 const REPORT_PHONE='972522851369';
-function waUrl(name){const txt="דיווח על טעות — Shay's Field Guide v2026.1\nערך: "+name+"\nמה בדיוק הבעיה? ";return 'https://wa.me/'+REPORT_PHONE+'?text='+encodeURIComponent(txt);}
+function waUrl(name){const u=who();const who_=u&&u.n?('\nמדווח: '+u.n+(u.o?' ('+u.o+')':'')):'';const txt="דיווח על טעות — Shay's Field Guide v2026.1\nערך: "+name+who_+"\nמה בדיוק הבעיה? ";return 'https://wa.me/'+REPORT_PHONE+'?text='+encodeURIComponent(txt);}
 let lastItem=null;
 function keyName(k){const n=+k.slice(3);if(k.startsWith('dxi'))return DATA.ddx[n].sign;if(k.startsWith('bwi'))return DATA.bloodwork[n].name;if(k.startsWith('tti'))return DATA.tests[n].disease;if(k.startsWith('vti'))return DATA.vitals[n].disease;return null;}
 function reportFab(){const where=tab==='ddx'?'DDx Signs':'Lab Values / '+({vitals:'Normal Values',bloodwork:'Bloodwork',tests:'Diagnostics',patterns:'Patterns'}[sub]||sub);
@@ -407,6 +423,29 @@ document.getElementById('clear').addEventListener('click',()=>{
 document.addEventListener('click',e=>{if(!sbox.contains(e.target))acEl.classList.remove('show');});
 searchEl.addEventListener('focus',()=>{if(query)renderAC();});
 syncTabs();render();
+
+// ---- registration (stored on device; optional WhatsApp ping) ----
+function who(){try{return JSON.parse(localStorage.getItem('shayGuideUser')||'null');}catch(e){return null;}}
+function showReg(){const r=document.getElementById('reg');if(who()){r.style.display='none';return;}r.style.display='flex';
+ document.getElementById('rgGo').onclick=()=>{const n=document.getElementById('rgName').value.trim();if(!n){document.getElementById('rgName').focus();return;}
+  const o='';
+  try{localStorage.setItem('shayGuideUser',JSON.stringify({n:n,o:o,t:Date.now()}));}catch(e){}
+  r.style.display='none';
+  window.open('https://wa.me/'+REPORT_PHONE+'?text='+encodeURIComponent('נרשמתי למדריך השטח\nשם: '+n+(o?'\nאזור: '+o:'')),'_blank');};}
+// ---- install banner ----
+let deferredPrompt=null;
+const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function showInstallBar(){const bar=document.getElementById('ibar');if(isStandalone()||localStorage.getItem('shayGuideNoInstall'))return;
+ const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ if(!deferredPrompt&&!iOS)return;
+ if(iOS){document.getElementById('itxt').textContent='להתקנה: כפתור שיתוף ← הוסף למסך הבית';document.getElementById('ibtn').style.display='none';}
+ bar.style.display='flex';document.body.style.paddingTop='42px';}
+document.getElementById('ix').onclick=()=>{document.getElementById('ibar').style.display='none';document.body.style.paddingTop='';try{localStorage.setItem('shayGuideNoInstall','1');}catch(e){}};
+document.getElementById('ibtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;
+ document.getElementById('ibar').style.display='none';document.body.style.paddingTop='';};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;showInstallBar();});
+window.addEventListener('appinstalled',()=>{document.getElementById('ibar').style.display='none';document.body.style.paddingTop='';});
+showReg();setTimeout(showInstallBar,1200);
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
 </body>
